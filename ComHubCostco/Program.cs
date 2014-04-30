@@ -11,15 +11,106 @@ using FTP;
 using ComHub;
 using System.Xml.Schema;
 using System.Xml.Linq;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ComHubCostco
 {
     class Program
     {
+        static string json = @"{'confId':2,
+        'Confirms':[{'ID':1,'PartnerTrxId':'005500','PartnerTrxDt':'wersdf','PoNumber':'00000110421565','VendorsInvoiceNumber':'werwerwer','pkgId':3,
+                'Packages':[{'ID':'P_1001','ShipDate':'werwer','ServiceLevel1':'345345','TrackingNumber':'ertert','Weight':'45345','$$hashKey':'007'},
+                            {'ID':'P_1002','ShipDate':'werwerwr','ServiceLevel1':'ertert','TrackingNumber':'ert','Weight':'4545','$$hashKey':'009'},
+                            {'ID':'P_1003','ShipDate':'34536345','ServiceLevel1':'ert','TrackingNumber':'eryert','Weight':'4545','$$hashKey':'00B'}],
+                            'actId':1,
+                'Actions':[{'ID':1,'Shipment':true,'MerchantLineNumber':'ssd','TrxVendorSKU':'asd','TrxMerchantSKU':'asd','TrxQty':'4545.6',
+                                'PackageIDs':['P_1002','P_1001'],'$$hashKey':'00D'}],'$$hashKey':'005','conf':{'PartnerTrxId':'234234'}},
+            {'ID':2,'PartnerTrxId':null,'PartnerTrxDt':'ertertrt','PoNumber':'ertr','VendorsInvoiceNumber':'ertyetr','pkgId':2,
+                'Packages':[{'ID':'P_2001','ShipDate':'2233434','ServiceLevel1':'3434','TrackingNumber':'345435','Weight':'345','$$hashKey':'00O'},
+                            {'ID':'P_2002','ShipDate':'34545','ServiceLevel1':'3453','TrackingNumber':'34545','Weight':'3455435','$$hashKey':'00Q'}],'actId':2,
+                'Actions':[{'ID':1,'Shipment':true,'MerchantLineNumber':'234234','TrxVendorSKU':'fgreter','TrxMerchantSKU':'345345','TrxQty':'121312',
+                                'PackageIDs':['P_2002'],'$$hashKey':'00M'},
+                            {'ID':2,'Shipment':true,'MerchantLineNumber':'345','TrxVendorSKU':'54365','TrxMerchantSKU':'456456','TrxQty':'456546',
+                                'PackageIDs':['P_2001'],'$$hashKey':'00S'}],'$$hashKey':'00J','conf':{'PartnerTrxId':'ert'}}]}";
+            //"{\"confId\":2,\"Confirms\":[{\"ID\":1,\"PartnerTrxId\":null,\"PartnerTrxDt\":\"wersdf\",\"PoNumber\":\"00000110421565\",\"VendorsInvoiceNumber\":\"werwerwer\",\"pkgId\":3,\"Packages\":[{\"ID\":\"P_1001\",\"ShipDate\":\"werwer\",\"ServiceLevel1\":\"345345\",\"TrackingNumber\":\"ertert\",\"Weight\":\"45345\",\"$$hashKey\":\"007\"},{\"ID\":\"P_1002\",\"ShipDate\":\"werwerwr\",\"ServiceLevel1\":\"ertert\",\"TrackingNumber\":\"ert\",\"Weight\":\"4545\",\"$$hashKey\":\"009\"},{\"ID\":\"P_1003\",\"ShipDate\":\"34536345\",\"ServiceLevel1\":\"ert\",\"TrackingNumber\":\"eryert\",\"Weight\":\"4545\",\"$$hashKey\":\"00B\"}],\"actId\":1,\"Actions\":[{\"ID\":1,\"Shipment\":true,\"MerchantLineNumber\":\"ssd\",\"TrxVendorSKU\":\"asd\",\"TrxMerchantSKU\":\"asd\",\"TrxQty\":\"4545.6\",\"PackageIDs\":[\"P_1002\",\"P_1001\"],\"$$hashKey\":\"00D\"}],\"$$hashKey\":\"005\",\"conf\":{\"PartnerTrxId\":\"234234\"}},{\"ID\":2,\"PartnerTrxId\":null,\"PartnerTrxDt\":\"ertertrt\",\"PoNumber\":\"ertr\",\"VendorsInvoiceNumber\":\"ertyetr\",\"pkgId\":2,\"Packages\":[{\"ID\":\"P_2001\",\"ShipDate\":\"2233434\",\"ServiceLevel1\":\"3434\",\"TrackingNumber\":\"345435\",\"Weight\":\"345\",\"$$hashKey\":\"00O\"},{\"ID\":\"P_2002\",\"ShipDate\":\"34545\",\"ServiceLevel1\":\"3453\",\"TrackingNumber\":\"34545\",\"Weight\":\"3455435\",\"$$hashKey\":\"00Q\"}],\"actId\":2,\"Actions\":[{\"ID\":1,\"Shipment\":true,\"MerchantLineNumber\":\"234234\",\"TrxVendorSKU\":\"fgreter\",\"TrxMerchantSKU\":\"345345\",\"TrxQty\":\"121312\",\"PackageIDs\":[\"P_2002\"],\"$$hashKey\":\"00M\"},{\"ID\":2,\"Shipment\":true,\"MerchantLineNumber\":\"345\",\"TrxVendorSKU\":\"54365\",\"TrxMerchantSKU\":\"456456\",\"TrxQty\":\"456546\",\"PackageIDs\":[\"P_2001\"],\"$$hashKey\":\"00S\"}],\"$$hashKey\":\"00J\",\"conf\":{\"PartnerTrxId\":\"ert\"}}]};";
+
         static void Main(string[] args)
         {
-            ListDirs();
+            JObject batch = JObject.Parse(json);
+
+            string poNumber;
+            string vendorsInvoiceNumber;
+            string partnerTrxId;
+            string partnerTrxDt;
+
+            hubConfirm newHubConfirm;
+
+            string packageID;
+            string shipDate;
+            string serviceLevel1;
+            string trackingNumber;
+            string weight;
+
+            packageDetail newackageDetail;
+
+            bool shipment;
+            string merchantLineNumber;
+            string trxVendorSKU;
+            string trxMerchantSKU;
+            string trxQty;
+            string[] pkgIDs;
+
+            hubAction newHubAction;
+
+            ConfirmMessageBatch confirmBatch = new ConfirmMessageBatch();
+            confirmBatch.CostcoSetup();
+
+            var confirms = from c in batch["Confirms"]
+                           select c;
+            foreach (var c in confirms)
+            {
+                poNumber = (string)c["PoNumber"];
+                partnerTrxId = (string)c["PartnerTrxId"];
+                partnerTrxDt = (string)c["PartnerTrxDt"];
+                vendorsInvoiceNumber = (string)c["VendorsInvoiceNumber"];
+                
+                newHubConfirm = confirmBatch.AddHubConfirm(partnerTrxId, partnerTrxDt, poNumber, vendorsInvoiceNumber);
+
+
+                var packages = from p in c["Packages"]
+                               select p;
+                foreach (var p in packages)
+                {
+                    packageID = (string)p["ID"];
+                    shipDate = (string)p["ShipDate"];
+                    serviceLevel1 = (string)p["ServiceLevel1"];
+                    trackingNumber = (string)p["TrackingNumber"];
+                    weight = (string)p["Weight"];
+
+                    newackageDetail = newHubConfirm.AddPackageDetail(shipDate, serviceLevel1, trackingNumber, weight);
+                }
+                
+                var actions = from a in c["Actions"]
+                              select a;
+                foreach (var a in actions) 
+                {
+                    shipment = (bool)a["Shipment"];
+                    merchantLineNumber = (string)a["MerchantLineNumber"];
+                    trxVendorSKU = (string)a["TrxVendorSKU"];
+                    trxMerchantSKU = (string)a["TrxMerchantSKU"];
+                    trxQty = (string)a["TrxQty"];
+
+                    pkgIDs = (from i in a["PackageIDs"]
+                              select (string)i).ToArray();
+
+                    newHubAction = newHubConfirm.AddHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
+                        pkgIDs);
+                }
+
+            }
+            
+            confirmBatch.ValidateXml();
         }
 
         static void MakeConfirm()
@@ -27,12 +118,12 @@ namespace ComHubCostco
             string poNumber;
             string vendorsInvoiceNumber;
             string partnerTrxId;
-            DateTime partnerTrxDt;
+            string partnerTrxDt;
 
-            DateTime shipDate;
+            string shipDate;
             string serviceLevel1;
             string trackingNumber;
-            double weight;
+            string weight;
 
             string merchantLineNumber;
             string trxVendorSKU;
@@ -47,7 +138,7 @@ namespace ComHubCostco
 
             poNumber = order.poNumber; //"00000033568603";
             partnerTrxId = "1234567"; // rw invoice, ship record?
-            partnerTrxDt = DateTime.Today; // rw invioce date. ship record date?
+            partnerTrxDt = "20141204"; // rw invioce date. ship record date?
             vendorsInvoiceNumber = "1234567"; //rw so, invoice?
 
             hubConfirm newHubConfirm = confirmMessage.AddHubConfirm(partnerTrxId, partnerTrxDt, poNumber, vendorsInvoiceNumber);
@@ -55,12 +146,10 @@ namespace ComHubCostco
             lineItem lineItem = order.lineItem[0];
 
             //string packageDetailID = "P001";
-            shipDate = DateTime.Today;
+            shipDate = String.Format("{0:yyyyMMdd}", DateTime.Today);
             serviceLevel1 = "UPSN_CG"; //Contact CommerceHub to obtain a complete list of codes that apply to this element.
             trackingNumber = "1232123";
-            string weightStr = lineItem.poLineData.unitShippingWeight.Text[0];
-            Double.TryParse(weightStr, out weight);
-            //weight = Convert.ToDecimal(weightStr, new CultureInfo("en-US")); // 25.3;
+            weight = lineItem.poLineData.unitShippingWeight.Text[0];
 
             packageDetail newackageDetail = newHubConfirm.AddPackageDetail(shipDate, serviceLevel1, trackingNumber, weight);
 
@@ -70,7 +159,7 @@ namespace ComHubCostco
             trxQty = lineItem.qtyOrdered;                      //2;
 
             hubAction newHubAction = newHubConfirm.AddHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
-                newackageDetail);
+                newackageDetail.packageDetailID);
 
             confirmMessage.ValidateXml();
 

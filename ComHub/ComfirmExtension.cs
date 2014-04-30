@@ -56,12 +56,12 @@ namespace ComHub
             return AddHubConfirm(newHubConfirm);
         }
 
-        public hubConfirm AddHubConfirm(string partnerTrxID, DateTime partnerTrxDt, string poNumber, string vendorsInvoiceNumber=null)
+        public hubConfirm AddHubConfirm(string partnerTrxID, string partnerTrxDt, string poNumber, string vendorsInvoiceNumber=null)
         {
             hubConfirm newHubConfirm = new hubConfirm(this)
             {
                 partnerTrxID = partnerTrxID,
-                partnerTrxDate = String.Format("{0:yyyyMMdd}", partnerTrxDt),
+                partnerTrxDate = partnerTrxDt,
                 poNumber = poNumber
             };
 
@@ -126,14 +126,14 @@ namespace ComHub
 
         public static hubAction MakeHubActionShip(
             string merchantLineNumber, string trxVendorSKU, string trxMerchantSKU, string trxQty,
-            params packageDetail[] packageDetails)
+            params string[] packageIDs)
         {
             List<packageDetailLink> packageDetailLinks = new List<packageDetailLink>();
 
-            foreach (var packageDetail in packageDetails)
+            foreach (var id in packageIDs)
             {
                 packageDetailLinks.Add(
-                    new packageDetailLink { packageDetailID = packageDetail.packageDetailID }
+                    new packageDetailLink { packageDetailID = id }
                 );
             }
 
@@ -151,10 +151,10 @@ namespace ComHub
 
         public hubAction AddHubActionShip(
             string merchantLineNumber, string trxVendorSKU, string trxMerchantSKU, string trxQty,
-            params packageDetail[] packageDetails)
+            params string[] packageIDs)
         {
             hubAction newHubAction = MakeHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
-                packageDetails);
+                packageIDs);
 
             hubActionList.Add(newHubAction);
 
@@ -164,18 +164,18 @@ namespace ComHub
         }
 
         public static packageDetail MakePackageDetail(
-            string packageDetailID, DateTime shipDate, string serviceLevel1, string trackingNumber, double weight)
+            string packageDetailID, string shipDate, string serviceLevel1, string trackingNumber, string weight)
         {
             return new packageDetail
             {
                 packageDetailID = packageDetailID,
-                shipDate = String.Format("{0:yyyyMMdd}", shipDate),
+                shipDate = shipDate,
                 serviceLevel1 = serviceLevel1,
                 trackingNumber = trackingNumber,
                 shippingWeight = new shippingWeight
                 {
                     weightUnit = shippingWeightWeightUnit.LB,
-                    Text = new string[] { weight.ToString() }
+                    Text = new string[] { weight }
                 }
             };
         }
@@ -186,7 +186,7 @@ namespace ComHub
         }
 
         public packageDetail AddPackageDetail(
-            DateTime shipDate, string serviceLevel1, string trackingNumber, double weight,
+            string shipDate, string serviceLevel1, string trackingNumber, string weight,
             string idBase = null)
         {
             if (idBase == null)
