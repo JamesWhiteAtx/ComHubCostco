@@ -154,12 +154,42 @@ namespace ComHub
 
         }
 
+        public static hubAction MakeHubActionCancel(string actionCode,
+            string merchantLineNumber, string trxVendorSKU, string trxMerchantSKU, string trxQty)
+        {
+            List<packageDetailLink> packageDetailLinks = new List<packageDetailLink>();
+
+            return new hubAction
+            {
+                action = action.v_cancel,
+                actionCode = actionCode,
+                merchantLineNumber = merchantLineNumber,
+                trxVendorSKU = trxVendorSKU,
+                trxMerchantSKU = trxMerchantSKU,
+                trxQty = trxQty,
+                packageDetailLink = packageDetailLinks.ToArray()
+            };
+
+        }
+
         public hubAction AddHubActionShip(
             string merchantLineNumber, string trxVendorSKU, string trxMerchantSKU, string trxQty,
             params string[] packageIDs)
         {
             hubAction newHubAction = MakeHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
                 packageIDs);
+
+            hubActionList.Add(newHubAction);
+
+            this.hubAction = hubActionList.ToArray();
+
+            return newHubAction;
+        }
+
+        public hubAction AddHubActionCancel(string actionCode,
+            string merchantLineNumber, string trxVendorSKU, string trxMerchantSKU, string trxQty)
+        {
+            hubAction newHubAction = MakeHubActionCancel(actionCode, merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty);
 
             hubActionList.Add(newHubAction);
 
@@ -185,21 +215,14 @@ namespace ComHub
             };
         }
 
-        private string MakePackageDetailID(string idBase)
-        {
-            return packageDetailsPrfx + idBase.Trim();
-        }
+        //private string MakePackageDetailID(string idBase)
+        //{
+        //    return packageDetailsPrfx + idBase.Trim();
+        //}
 
-        public packageDetail AddPackageDetail(
-            string shipDate, string serviceLevel1, string trackingNumber, string weight,
-            string idBase = null)
+        public packageDetail AddPackageDetail(string packageDetailID,
+            string shipDate, string serviceLevel1, string trackingNumber, string weight)
         {
-            if (idBase == null)
-            {
-                idBase = packageDetailList.Count.ToString();
-            };
-            string packageDetailID = MakePackageDetailID(idBase);
-
             packageDetail newPackageDetail = MakePackageDetail(packageDetailID, shipDate, serviceLevel1, trackingNumber, weight);
 
             packageDetailList.Add(newPackageDetail);
