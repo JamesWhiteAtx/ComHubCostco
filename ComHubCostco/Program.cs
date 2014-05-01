@@ -18,6 +18,42 @@ namespace ComHubCostco
 {
     class Program
     {
+        //
+        static string GetEncryptDir()
+        {
+            string merchant = "Costco";
+            string dirRoot = System.Configuration.ConfigurationManager.AppSettings["dirRoot" + merchant];
+            string dirEncrypt = System.Configuration.ConfigurationManager.AppSettings["dirEncrypt" + merchant];
+            string dirConfirms = System.Configuration.ConfigurationManager.AppSettings["dirConfirms" + merchant];
+            return Path.Combine(dirRoot, dirEncrypt, dirConfirms);
+        }
+        static string GetXmlDir()
+        {
+            string merchant = "Costco";
+            string dirRoot = System.Configuration.ConfigurationManager.AppSettings["dirRoot" + merchant];
+            string dirDecrypt = System.Configuration.ConfigurationManager.AppSettings["dirDecrypt" + merchant];
+            string dirConfirms = System.Configuration.ConfigurationManager.AppSettings["dirConfirms" + merchant];
+            return Path.Combine(dirRoot, dirDecrypt, dirConfirms);
+        }
+
+        static void Main(string[] args)
+        {
+            string fileName = "Sample.xml";
+            string xmlFilePath = Path.Combine(GetXmlDir(), fileName);
+            string encryptedFileName = GnuPG.EncryptFile(xmlFilePath, GetEncryptDir());
+
+            FileInfo file = new FileInfo(encryptedFileName);
+
+            var x = new 
+            {
+                Exists = file.Exists,
+                Path = file.DirectoryName,
+                Name = file.Name
+            };
+
+
+        }
+
         static string json = @"{'confId':2,
         'Confirms':[{'ID':1,'PartnerTrxId':'005500','PartnerTrxDt':'wersdf','PoNumber':'00000110421565','VendorsInvoiceNumber':'werwerwer','pkgId':3,
                 'Packages':[{'ID':'P_1001','ShipDate':'werwer','ServiceLevel1':'345345','TrackingNumber':'ertert','Weight':'45345','$$hashKey':'007'},
@@ -35,7 +71,7 @@ namespace ComHubCostco
                                 'PackageIDs':['P_2001'],'$$hashKey':'00S'}],'$$hashKey':'00J','conf':{'PartnerTrxId':'ert'}}]}";
             //"{\"confId\":2,\"Confirms\":[{\"ID\":1,\"PartnerTrxId\":null,\"PartnerTrxDt\":\"wersdf\",\"PoNumber\":\"00000110421565\",\"VendorsInvoiceNumber\":\"werwerwer\",\"pkgId\":3,\"Packages\":[{\"ID\":\"P_1001\",\"ShipDate\":\"werwer\",\"ServiceLevel1\":\"345345\",\"TrackingNumber\":\"ertert\",\"Weight\":\"45345\",\"$$hashKey\":\"007\"},{\"ID\":\"P_1002\",\"ShipDate\":\"werwerwr\",\"ServiceLevel1\":\"ertert\",\"TrackingNumber\":\"ert\",\"Weight\":\"4545\",\"$$hashKey\":\"009\"},{\"ID\":\"P_1003\",\"ShipDate\":\"34536345\",\"ServiceLevel1\":\"ert\",\"TrackingNumber\":\"eryert\",\"Weight\":\"4545\",\"$$hashKey\":\"00B\"}],\"actId\":1,\"Actions\":[{\"ID\":1,\"Shipment\":true,\"MerchantLineNumber\":\"ssd\",\"TrxVendorSKU\":\"asd\",\"TrxMerchantSKU\":\"asd\",\"TrxQty\":\"4545.6\",\"PackageIDs\":[\"P_1002\",\"P_1001\"],\"$$hashKey\":\"00D\"}],\"$$hashKey\":\"005\",\"conf\":{\"PartnerTrxId\":\"234234\"}},{\"ID\":2,\"PartnerTrxId\":null,\"PartnerTrxDt\":\"ertertrt\",\"PoNumber\":\"ertr\",\"VendorsInvoiceNumber\":\"ertyetr\",\"pkgId\":2,\"Packages\":[{\"ID\":\"P_2001\",\"ShipDate\":\"2233434\",\"ServiceLevel1\":\"3434\",\"TrackingNumber\":\"345435\",\"Weight\":\"345\",\"$$hashKey\":\"00O\"},{\"ID\":\"P_2002\",\"ShipDate\":\"34545\",\"ServiceLevel1\":\"3453\",\"TrackingNumber\":\"34545\",\"Weight\":\"3455435\",\"$$hashKey\":\"00Q\"}],\"actId\":2,\"Actions\":[{\"ID\":1,\"Shipment\":true,\"MerchantLineNumber\":\"234234\",\"TrxVendorSKU\":\"fgreter\",\"TrxMerchantSKU\":\"345345\",\"TrxQty\":\"121312\",\"PackageIDs\":[\"P_2002\"],\"$$hashKey\":\"00M\"},{\"ID\":2,\"Shipment\":true,\"MerchantLineNumber\":\"345\",\"TrxVendorSKU\":\"54365\",\"TrxMerchantSKU\":\"456456\",\"TrxQty\":\"456546\",\"PackageIDs\":[\"P_2001\"],\"$$hashKey\":\"00S\"}],\"$$hashKey\":\"00J\",\"conf\":{\"PartnerTrxId\":\"ert\"}}]};";
 
-        static void Main(string[] args)
+        static void confFromJson()
         {
             JObject batch = JObject.Parse(json);
 

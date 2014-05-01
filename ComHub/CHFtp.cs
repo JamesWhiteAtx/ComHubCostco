@@ -49,7 +49,7 @@ namespace ComHub
             FtpPassword = System.Configuration.ConfigurationManager.AppSettings["ftpPass" + merchant];
 
             string dirRoot = System.Configuration.ConfigurationManager.AppSettings["dirRoot" + merchant];
-            string dirDownload = System.Configuration.ConfigurationManager.AppSettings["dirDownload" + merchant];
+            string dirDownload = System.Configuration.ConfigurationManager.AppSettings["dirEncrypt" + merchant];
             string dirDecrypt = System.Configuration.ConfigurationManager.AppSettings["dirDecrypt" + merchant];
             string dirOrders = System.Configuration.ConfigurationManager.AppSettings["dirOrders" + merchant];
             string dirPayment = System.Configuration.ConfigurationManager.AppSettings["dirPayment" + merchant];
@@ -124,6 +124,14 @@ namespace ComHub
         public void ListFtpPayments()
         {
             ListFtpFiles(GetFtpPayments());
+        }
+
+        public bool Download(string fileName, string localFilename, bool PermitOverwrite)
+        { 
+            FTPclient ftp = new FTPclient(HostOrders.AbsoluteUri, FtpUser, FtpPassword);
+            ftp.UsePassive = true;
+
+            return ftp.Download(fileName, localFilename, true);
         }
 
     }

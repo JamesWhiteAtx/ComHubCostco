@@ -29,7 +29,10 @@ namespace ComHub
 
         public void ValidateXml()
         {
-            SerializationUtil.ValidateXml(Serialize(), this.xsdFile);
+            string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
+            string xsdFilePath = Path.Combine(path, xsdFile);
+
+            SerializationUtil.ValidateXml(Serialize(), xsdFilePath);
         }
 
         public FileInfo SaveFile(string path)

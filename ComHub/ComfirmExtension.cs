@@ -83,6 +83,11 @@ namespace ComHub
             return newHubConfirm;
         }
 
+        public static ConfirmMessageBatch Deserialize(string path)
+        {
+            return MessageBatch.Deserialize<ConfirmMessageBatch>(path);
+        }
+
     }
 
     public partial class hubConfirm
