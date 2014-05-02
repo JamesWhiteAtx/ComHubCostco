@@ -54,6 +54,7 @@
     <Compile Include="SerializationUtil.cs" />
     <Compile Include="Services\AppSettingsService.cs" />
     <Compile Include="Services\CHFtpService.cs" />
+    <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\GnuPGService.cs" />
   </ItemGroup>
   <ItemGroup>
