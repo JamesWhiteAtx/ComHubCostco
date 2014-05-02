@@ -38,20 +38,23 @@ namespace ComHubCostco
 
         static void Main(string[] args)
         {
-            string fileName = "Sample.xml";
-            string xmlFilePath = Path.Combine(GetXmlDir(), fileName);
-            string encryptedFileName = GnuPG.EncryptFile(xmlFilePath, GetEncryptDir());
-
-            FileInfo file = new FileInfo(encryptedFileName);
-
-            var x = new 
-            {
-                Exists = file.Exists,
-                Path = file.DirectoryName,
-                Name = file.Name
-            };
-
-
+            AppSettingsService app = new AppSettingsService();
+            Console.WriteLine(app.Costco.Dir.Encrypt.Orders.Path);
+            Console.WriteLine(app.Costco.Dir.Encrypt.Confirms.Path);
+            Console.WriteLine(app.Costco.Dir.Decrypt.Orders.Path);
+            Console.WriteLine(app.Costco.Dir.Decrypt.Confirms.Path);
+        
+        Console.WriteLine(app.Costco.PartnerID);
+        Console.WriteLine(app.Costco.PartyName);
+        Console.WriteLine(app.Costco.FtpHost);
+        Console.WriteLine(app.Costco.FtpOrders);
+        Console.WriteLine(app.Costco.FtpPayment);
+        Console.WriteLine(app.Costco.FtpUser);
+        Console.WriteLine(app.Costco.FtpPass);
+        Console.WriteLine(app.GnupgDir);
+        Console.WriteLine(app.Passphrase);
+            
+            Console.ReadKey();
         }
 
         static string json = @"{'confId':2,
@@ -71,136 +74,136 @@ namespace ComHubCostco
                                 'PackageIDs':['P_2001'],'$$hashKey':'00S'}],'$$hashKey':'00J','conf':{'PartnerTrxId':'ert'}}]}";
             //"{\"confId\":2,\"Confirms\":[{\"ID\":1,\"PartnerTrxId\":null,\"PartnerTrxDt\":\"wersdf\",\"PoNumber\":\"00000110421565\",\"VendorsInvoiceNumber\":\"werwerwer\",\"pkgId\":3,\"Packages\":[{\"ID\":\"P_1001\",\"ShipDate\":\"werwer\",\"ServiceLevel1\":\"345345\",\"TrackingNumber\":\"ertert\",\"Weight\":\"45345\",\"$$hashKey\":\"007\"},{\"ID\":\"P_1002\",\"ShipDate\":\"werwerwr\",\"ServiceLevel1\":\"ertert\",\"TrackingNumber\":\"ert\",\"Weight\":\"4545\",\"$$hashKey\":\"009\"},{\"ID\":\"P_1003\",\"ShipDate\":\"34536345\",\"ServiceLevel1\":\"ert\",\"TrackingNumber\":\"eryert\",\"Weight\":\"4545\",\"$$hashKey\":\"00B\"}],\"actId\":1,\"Actions\":[{\"ID\":1,\"Shipment\":true,\"MerchantLineNumber\":\"ssd\",\"TrxVendorSKU\":\"asd\",\"TrxMerchantSKU\":\"asd\",\"TrxQty\":\"4545.6\",\"PackageIDs\":[\"P_1002\",\"P_1001\"],\"$$hashKey\":\"00D\"}],\"$$hashKey\":\"005\",\"conf\":{\"PartnerTrxId\":\"234234\"}},{\"ID\":2,\"PartnerTrxId\":null,\"PartnerTrxDt\":\"ertertrt\",\"PoNumber\":\"ertr\",\"VendorsInvoiceNumber\":\"ertyetr\",\"pkgId\":2,\"Packages\":[{\"ID\":\"P_2001\",\"ShipDate\":\"2233434\",\"ServiceLevel1\":\"3434\",\"TrackingNumber\":\"345435\",\"Weight\":\"345\",\"$$hashKey\":\"00O\"},{\"ID\":\"P_2002\",\"ShipDate\":\"34545\",\"ServiceLevel1\":\"3453\",\"TrackingNumber\":\"34545\",\"Weight\":\"3455435\",\"$$hashKey\":\"00Q\"}],\"actId\":2,\"Actions\":[{\"ID\":1,\"Shipment\":true,\"MerchantLineNumber\":\"234234\",\"TrxVendorSKU\":\"fgreter\",\"TrxMerchantSKU\":\"345345\",\"TrxQty\":\"121312\",\"PackageIDs\":[\"P_2002\"],\"$$hashKey\":\"00M\"},{\"ID\":2,\"Shipment\":true,\"MerchantLineNumber\":\"345\",\"TrxVendorSKU\":\"54365\",\"TrxMerchantSKU\":\"456456\",\"TrxQty\":\"456546\",\"PackageIDs\":[\"P_2001\"],\"$$hashKey\":\"00S\"}],\"$$hashKey\":\"00J\",\"conf\":{\"PartnerTrxId\":\"ert\"}}]};";
 
-        static void confFromJson()
-        {
-            JObject batch = JObject.Parse(json);
+        //static void confFromJson()
+        //{
+        //    JObject batch = JObject.Parse(json);
 
-            string poNumber;
-            string vendorsInvoiceNumber;
-            string partnerTrxId;
-            string partnerTrxDt;
+        //    string poNumber;
+        //    string vendorsInvoiceNumber;
+        //    string partnerTrxId;
+        //    string partnerTrxDt;
 
-            hubConfirm newHubConfirm;
+        //    hubConfirm newHubConfirm;
 
-            string packageID;
-            string shipDate;
-            string serviceLevel1;
-            string trackingNumber;
-            string weight;
+        //    string packageID;
+        //    string shipDate;
+        //    string serviceLevel1;
+        //    string trackingNumber;
+        //    string weight;
 
-            packageDetail newackageDetail;
+        //    packageDetail newackageDetail;
 
-            bool shipment;
-            string merchantLineNumber;
-            string trxVendorSKU;
-            string trxMerchantSKU;
-            string trxQty;
-            string[] pkgIDs;
+        //    bool shipment;
+        //    string merchantLineNumber;
+        //    string trxVendorSKU;
+        //    string trxMerchantSKU;
+        //    string trxQty;
+        //    string[] pkgIDs;
 
-            hubAction newHubAction;
+        //    hubAction newHubAction;
 
-            ConfirmMessageBatch confirmBatch = new ConfirmMessageBatch();
-            confirmBatch.CostcoSetup();
+        //    ConfirmMessageBatch confirmBatch = new ConfirmMessageBatch();
+        //    confirmBatch.CostcoSetup();
 
-            var confirms = from c in batch["Confirms"]
-                           select c;
-            foreach (var c in confirms)
-            {
-                poNumber = (string)c["PoNumber"];
-                partnerTrxId = (string)c["PartnerTrxId"];
-                partnerTrxDt = (string)c["PartnerTrxDt"];
-                vendorsInvoiceNumber = (string)c["VendorsInvoiceNumber"];
+        //    var confirms = from c in batch["Confirms"]
+        //                   select c;
+        //    foreach (var c in confirms)
+        //    {
+        //        poNumber = (string)c["PoNumber"];
+        //        partnerTrxId = (string)c["PartnerTrxId"];
+        //        partnerTrxDt = (string)c["PartnerTrxDt"];
+        //        vendorsInvoiceNumber = (string)c["VendorsInvoiceNumber"];
                 
-                newHubConfirm = confirmBatch.AddHubConfirm(partnerTrxId, partnerTrxDt, poNumber, vendorsInvoiceNumber);
+        //        newHubConfirm = confirmBatch.AddHubConfirm(partnerTrxId, partnerTrxDt, poNumber, vendorsInvoiceNumber);
 
 
-                var packages = from p in c["Packages"]
-                               select p;
-                foreach (var p in packages)
-                {
-                    packageID = (string)p["ID"];
-                    shipDate = (string)p["ShipDate"];
-                    serviceLevel1 = (string)p["ServiceLevel1"];
-                    trackingNumber = (string)p["TrackingNumber"];
-                    weight = (string)p["Weight"];
+        //        var packages = from p in c["Packages"]
+        //                       select p;
+        //        foreach (var p in packages)
+        //        {
+        //            packageID = (string)p["ID"];
+        //            shipDate = (string)p["ShipDate"];
+        //            serviceLevel1 = (string)p["ServiceLevel1"];
+        //            trackingNumber = (string)p["TrackingNumber"];
+        //            weight = (string)p["Weight"];
 
-                    newackageDetail = newHubConfirm.AddPackageDetail(shipDate, serviceLevel1, trackingNumber, weight);
-                }
+        //            newackageDetail = newHubConfirm.AddPackageDetail(shipDate, serviceLevel1, trackingNumber, weight);
+        //        }
                 
-                var actions = from a in c["Actions"]
-                              select a;
-                foreach (var a in actions) 
-                {
-                    shipment = (bool)a["Shipment"];
-                    merchantLineNumber = (string)a["MerchantLineNumber"];
-                    trxVendorSKU = (string)a["TrxVendorSKU"];
-                    trxMerchantSKU = (string)a["TrxMerchantSKU"];
-                    trxQty = (string)a["TrxQty"];
+        //        var actions = from a in c["Actions"]
+        //                      select a;
+        //        foreach (var a in actions) 
+        //        {
+        //            shipment = (bool)a["Shipment"];
+        //            merchantLineNumber = (string)a["MerchantLineNumber"];
+        //            trxVendorSKU = (string)a["TrxVendorSKU"];
+        //            trxMerchantSKU = (string)a["TrxMerchantSKU"];
+        //            trxQty = (string)a["TrxQty"];
 
-                    pkgIDs = (from i in a["PackageIDs"]
-                              select (string)i).ToArray();
+        //            pkgIDs = (from i in a["PackageIDs"]
+        //                      select (string)i).ToArray();
 
-                    newHubAction = newHubConfirm.AddHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
-                        pkgIDs);
-                }
+        //            newHubAction = newHubConfirm.AddHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
+        //                pkgIDs);
+        //        }
 
-            }
+        //    }
             
-            confirmBatch.ValidateXml();
-        }
+        //    confirmBatch.ValidateXml();
+        //}
 
-        static void MakeConfirm()
-        {
-            string poNumber;
-            string vendorsInvoiceNumber;
-            string partnerTrxId;
-            string partnerTrxDt;
+        //static void MakeConfirm()
+        //{
+        //    string poNumber;
+        //    string vendorsInvoiceNumber;
+        //    string partnerTrxId;
+        //    string partnerTrxDt;
 
-            string shipDate;
-            string serviceLevel1;
-            string trackingNumber;
-            string weight;
+        //    string shipDate;
+        //    string serviceLevel1;
+        //    string trackingNumber;
+        //    string weight;
 
-            string merchantLineNumber;
-            string trxVendorSKU;
-            string trxMerchantSKU;
-            string trxQty;
+        //    string merchantLineNumber;
+        //    string trxVendorSKU;
+        //    string trxMerchantSKU;
+        //    string trxQty;
 
-            OrderMessageBatch orderBatch = OrderMessageBatch.Deserialize(@"C:\CommerceHub\Order.xml");
-            hubOrder order = orderBatch.hubOrder[0];
+        //    OrderMessageBatch orderBatch = OrderMessageBatch.Deserialize(@"C:\CommerceHub\Order.xml");
+        //    hubOrder order = orderBatch.hubOrder[0];
             
-            ConfirmMessageBatch confirmMessage = new ConfirmMessageBatch();
-            confirmMessage.CostcoSetup();
+        //    ConfirmMessageBatch confirmMessage = new ConfirmMessageBatch();
+        //    confirmMessage.CostcoSetup();
 
-            poNumber = order.poNumber; //"00000033568603";
-            partnerTrxId = "1234567"; // rw invoice, ship record?
-            partnerTrxDt = "20141204"; // rw invioce date. ship record date?
-            vendorsInvoiceNumber = "1234567"; //rw so, invoice?
+        //    poNumber = order.poNumber; //"00000033568603";
+        //    partnerTrxId = "1234567"; // rw invoice, ship record?
+        //    partnerTrxDt = "20141204"; // rw invioce date. ship record date?
+        //    vendorsInvoiceNumber = "1234567"; //rw so, invoice?
 
-            hubConfirm newHubConfirm = confirmMessage.AddHubConfirm(partnerTrxId, partnerTrxDt, poNumber, vendorsInvoiceNumber);
+        //    hubConfirm newHubConfirm = confirmMessage.AddHubConfirm(partnerTrxId, partnerTrxDt, poNumber, vendorsInvoiceNumber);
 
-            lineItem lineItem = order.lineItem[0];
+        //    lineItem lineItem = order.lineItem[0];
 
-            //string packageDetailID = "P001";
-            shipDate = String.Format("{0:yyyyMMdd}", DateTime.Today);
-            serviceLevel1 = "UPSN_CG"; //Contact CommerceHub to obtain a complete list of codes that apply to this element.
-            trackingNumber = "1232123";
-            weight = lineItem.poLineData.unitShippingWeight.Text[0];
+        //    //string packageDetailID = "P001";
+        //    shipDate = String.Format("{0:yyyyMMdd}", DateTime.Today);
+        //    serviceLevel1 = "UPSN_CG"; //Contact CommerceHub to obtain a complete list of codes that apply to this element.
+        //    trackingNumber = "1232123";
+        //    weight = lineItem.poLineData.unitShippingWeight.Text[0];
 
-            packageDetail newackageDetail = newHubConfirm.AddPackageDetail(shipDate, serviceLevel1, trackingNumber, weight);
+        //    packageDetail newackageDetail = newHubConfirm.AddPackageDetail(shipDate, serviceLevel1, trackingNumber, weight);
 
-            merchantLineNumber = lineItem.merchantLineNumber;  // 1;
-            trxVendorSKU = lineItem.vendorSKU;                 // "M1034";
-            trxMerchantSKU = lineItem.merchantSKU;             //"ZZ123213";
-            trxQty = lineItem.qtyOrdered;                      //2;
+        //    merchantLineNumber = lineItem.merchantLineNumber;  // 1;
+        //    trxVendorSKU = lineItem.vendorSKU;                 // "M1034";
+        //    trxMerchantSKU = lineItem.merchantSKU;             //"ZZ123213";
+        //    trxQty = lineItem.qtyOrdered;                      //2;
 
-            hubAction newHubAction = newHubConfirm.AddHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
-                newackageDetail.packageDetailID);
+        //    hubAction newHubAction = newHubConfirm.AddHubActionShip(merchantLineNumber, trxVendorSKU, trxMerchantSKU, trxQty,
+        //        newackageDetail.packageDetailID);
 
-            confirmMessage.ValidateXml();
+        //    confirmMessage.ValidateXml();
 
-            Console.WriteLine("fino");
-        }
+        //    Console.WriteLine("fino");
+        //}
 
         /*
          * C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC>xsd /classes /language:CS c:\CommerceHub\Order.xsd /outputdir:c:\CommerceHub /namespace:ComHub.Order
