@@ -18,6 +18,30 @@ namespace ComHubCostco
 {
     class Program
     {
+        private static void chgex(string name, string ext)
+        {
+            Console.WriteLine(name);
+            Console.WriteLine(Path.GetExtension(name));
+
+            string thisExt = Path.GetExtension(name);
+            if (String.IsNullOrWhiteSpace(thisExt))
+            {
+                name = Path.ChangeExtension(name, ext);
+            }
+
+            Console.WriteLine(name);
+            Console.WriteLine("==================");
+        }
+
+        static void Main(string[] args)
+        {
+            chgex("297863351.neworders");
+            chgex("297863351.neworders.xml");
+            chgex(@"c:\commercehub\encypes\orders\297863351.neworders.xml");
+
+            Console.ReadKey();
+
+        }
         //
         static string GetEncryptDir()
         {
@@ -36,7 +60,7 @@ namespace ComHubCostco
             return Path.Combine(dirRoot, dirDecrypt, dirConfirms);
         }
 
-        static void Main(string[] args)
+        static void ListAppSettins()
         {
             AppSettingsService app = new AppSettingsService();
             Console.WriteLine(app.Costco.Dir.Encrypt.Orders.Path);
