@@ -18,30 +18,43 @@ namespace ComHubCostco
 {
     class Program
     {
-        private static void chgex(string name, string ext)
+        public static void Main(string[] args)
         {
-            Console.WriteLine(name);
-            Console.WriteLine(Path.GetExtension(name));
+            DirectoryInfo dir = new DirectoryInfo(@"C:\CommerceHub\XML\Orders");
+            FileInfo[] decryptInfos = dir.GetFiles("*.xml");
+            
+            dir = new DirectoryInfo(@"C:\CommerceHub\Encrypted\Orders");
+            FileInfo[] encryptInfos = dir.GetFiles("*.gpg");
 
-            string thisExt = Path.GetExtension(name);
-            if (String.IsNullOrWhiteSpace(thisExt))
-            {
-                name = Path.ChangeExtension(name, ext);
-            }
+            
 
-            Console.WriteLine(name);
-            Console.WriteLine("==================");
+            var leftOuterJoin = from d in decryptInfos
+                                join e in encryptInfos
+                                on Path.GetFileNameWithoutExtension(d.Name) equals Path.GetFileNameWithoutExtension(e.Name)
+                                into temp
+                                from t in temp.DefaultIfEmpty()
+                                select new
+                                {
+                                    ID = Path.GetFileNameWithoutExtension(d.Name),
+                                    a = d,
+                                    b = t
+                                };
+
+            var rightOuterJoin = from e in encryptInfos
+                                 join d in decryptInfos
+                                 on Path.GetFileNameWithoutExtension(e.Name) equals Path.GetFileNameWithoutExtension(d.Name)
+                                 into temp
+                                 from t in temp.DefaultIfEmpty()
+                                 select new
+                                 {
+                                     ID = Path.GetFileNameWithoutExtension(e.Name),
+                                     a = t,
+                                     b = e
+                                 };
+
+            var fullOuterJoin = leftOuterJoin.Union(rightOuterJoin).OrderBy(x => x.ID).ToList();
         }
 
-        static void Main(string[] args)
-        {
-            chgex("297863351.neworders");
-            chgex("297863351.neworders.xml");
-            chgex(@"c:\commercehub\encypes\orders\297863351.neworders.xml");
-
-            Console.ReadKey();
-
-        }
         //
         static string GetEncryptDir()
         {

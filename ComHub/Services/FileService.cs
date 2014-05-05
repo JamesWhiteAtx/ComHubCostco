@@ -11,6 +11,9 @@ namespace ComHub
         FileInfo[] CostcoDecryptFilesOrder(IAppSettingsService appSettings);
         FileInfo[] CostcoDecryptFilesConfirm(IAppSettingsService appSettings);
 
+        FileInfo[] CostcoEncryptFilesOrder(IAppSettingsService appSettings);
+        FileInfo[] CostcoEncryptFilesConfirm(IAppSettingsService appSettings);
+
         OrderMessageBatch CostcoMessageBatchOrder(string fileName, IAppSettingsService appSettings);
         ConfirmMessageBatch CostcoMessageBatchConfirm(string fileName, IAppSettingsService appSettings);
     }
@@ -19,6 +22,8 @@ namespace ComHub
     {
         const string CostcoDecryptExt = "xml";
         const string CostcoDecryptFilePattern = "*." + CostcoDecryptExt;
+        const string CostcoEncryptExt = "gpg";
+        const string CostcoEncryptFilePattern = "*." + CostcoEncryptExt;
 
         private FileInfo[] CostcoDecryptFiles(string dirFiles)
         {
@@ -34,6 +39,22 @@ namespace ComHub
         public FileInfo[] CostcoDecryptFilesConfirm(IAppSettingsService appSettings)
         {
             return CostcoDecryptFiles(appSettings.Costco.Dir.Decrypt.Confirms.Path);
+        }
+
+        private FileInfo[] CostcoEncryptFiles(string dirFiles)
+        {
+            DirectoryInfo d = new DirectoryInfo(dirFiles);
+            return d.GetFiles(CostcoEncryptFilePattern);
+        }
+
+        public FileInfo[] CostcoEncryptFilesOrder(IAppSettingsService appSettings)
+        {
+            return CostcoEncryptFiles(appSettings.Costco.Dir.Encrypt.Orders.Path);
+        }
+
+        public FileInfo[] CostcoEncryptFilesConfirm(IAppSettingsService appSettings)
+        {
+            return CostcoEncryptFiles(appSettings.Costco.Dir.Encrypt.Confirms.Path);
         }
 
         public OrderMessageBatch CostcoMessageBatchOrder(string fileName, IAppSettingsService appSettings)
