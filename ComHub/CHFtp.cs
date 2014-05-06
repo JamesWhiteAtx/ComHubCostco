@@ -14,10 +14,11 @@ namespace ComHub
 
         public Uri HostOrders { get; set; }
         public Uri HostPayments { get; set; }
+        public Uri HostConfirms { get; set; }
         public string FtpUser { get; set; }
         public string FtpPassword { get; set; }
-        public string DirDownloadOrders { get; set; }
-        public string DirDownloadPayments { get; set; }
+        //public string DirDownloadOrders { get; set; }
+        //public string DirDownloadPayments { get; set; }
         public string PathGnupg { get; set; }
 
         public CHFtp()
@@ -36,6 +37,7 @@ namespace ComHub
             string ftpHost = System.Configuration.ConfigurationManager.AppSettings["ftpHost" + merchant];
             string ftpOrders = System.Configuration.ConfigurationManager.AppSettings["ftpOrders" + merchant];
             string ftpPayment = System.Configuration.ConfigurationManager.AppSettings["ftpPayment" + merchant];
+            string ftpConfirms = System.Configuration.ConfigurationManager.AppSettings["ftpConfirms" + merchant];
 
             if (!ftpHost.StartsWith("ftp://"))
             {
@@ -44,6 +46,7 @@ namespace ComHub
             Uri root = new Uri(ftpHost);
             HostOrders = new Uri(root, ftpOrders);
             HostPayments = new Uri(root, ftpPayment);
+            HostConfirms = new Uri(root, ftpConfirms);
 
             FtpUser = System.Configuration.ConfigurationManager.AppSettings["ftpUser" + merchant];
             FtpPassword = System.Configuration.ConfigurationManager.AppSettings["ftpPass" + merchant];
@@ -54,8 +57,8 @@ namespace ComHub
             string dirOrders = System.Configuration.ConfigurationManager.AppSettings["dirOrders" + merchant];
             string dirPayment = System.Configuration.ConfigurationManager.AppSettings["dirPayment" + merchant];
 
-            DirDownloadOrders = Path.Combine(dirRoot, dirDownload, dirOrders);
-            DirDownloadPayments = Path.Combine(dirRoot, dirDownload, dirPayment);
+            //DirDownloadOrders = Path.Combine(dirRoot, dirDownload, dirOrders);
+            //DirDownloadPayments = Path.Combine(dirRoot, dirDownload, dirPayment);
 
             PathGnupg = System.Configuration.ConfigurationManager.AppSettings["gnupgDir"];
         }
@@ -98,15 +101,15 @@ namespace ComHub
             return GetFtpFiles(HostPayments, ext);
         }
 
-        public void DownloadOrders()
-        {
-            _downloadedOrders = DownloadFiles(GetFtpOrders(), DirDownloadOrders);
-        }
+        //public void DownloadOrders()
+        //{
+        //    _downloadedOrders = DownloadFiles(GetFtpOrders(), DirDownloadOrders);
+        //}
 
-        public void DownloadPayments()
-        {
-            _downloadedPayments = DownloadFiles(GetFtpPayments(), DirDownloadPayments);
-        }
+        //public void DownloadPayments()
+        //{
+        //    _downloadedPayments = DownloadFiles(GetFtpPayments(), DirDownloadPayments);
+        //}
 
         public void ListFtpFiles(FTPdirectory files)
         {
@@ -126,13 +129,44 @@ namespace ComHub
             ListFtpFiles(GetFtpPayments());
         }
 
-        public bool Download(string fileName, string localFilename, bool PermitOverwrite)
-        { 
-            FTPclient ftp = new FTPclient(HostOrders.AbsoluteUri, FtpUser, FtpPassword);
+        public bool Download(Uri host, string fileName, string localFilename, bool permitOverwrite)
+        {
+            FTPclient ftp = new FTPclient(host.AbsoluteUri, FtpUser, FtpPassword);
             ftp.UsePassive = true;
 
-            return ftp.Download(fileName, localFilename, true);
+            return ftp.Download(fileName, localFilename, permitOverwrite);
         }
 
+        public bool DownloadOrder(string fileName, string localFilename, bool permitOverwrite = true)
+        { 
+            return Download(HostOrders, fileName, localFilename, permitOverwrite);
+        }
+
+        public bool Upload(Uri host, string localFilename)
+        {
+            string targFileName = Path.GetFileName(localFilename);
+
+            FTPclient ftp = new FTPclient(host.AbsoluteUri, FtpUser, FtpPassword);
+            ftp.UsePassive = true;
+            
+            return ftp.Upload(localFilename, targFileName);
+        }
+
+        public bool UploadConfirm(string localFilename)
+        {
+            return Upload(HostConfirms, localFilename);
+        }
+
+    }
+
+    public class CostcoCHFtp : CHFtp
+    {
+        public const string Costco = "Costco";
+
+        public CostcoCHFtp()
+            : base(Costco)
+        {
+
+        }
     }
 }

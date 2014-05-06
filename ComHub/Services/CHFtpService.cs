@@ -11,13 +11,14 @@ namespace ComHub
     {
         List<FTPfileInfo> GetCostcoOrders();
         FileInfo DownloadCostoOrder(string fileName, IAppSettingsService appSettings);
+        bool UploadCostcoConfirm(string fileName, IAppSettingsService appSettings);
     }
 
     public class CHFtpService : ICHFtpService
     {
         public List<FTPfileInfo> GetCostcoOrders()
         {
-            CHFtp costcoFtp = new CHFtp("Costco");
+            CostcoCHFtp costcoFtp = new CostcoCHFtp();
             List<FTPfileInfo> orders = costcoFtp.GetFtpOrders();
             return orders;
         }
@@ -25,11 +26,19 @@ namespace ComHub
         public FileInfo DownloadCostoOrder(string fileName, IAppSettingsService appSettings)
         {
             string encryptedFilePath = Path.Combine(appSettings.Costco.Dir.Encrypt.Orders.Path, fileName);
-            CHFtp costcoFtp = new CHFtp("Costco");
-            
-            costcoFtp.Download(fileName, encryptedFilePath, true);
+
+            CostcoCHFtp costcoFtp = new CostcoCHFtp();
+            costcoFtp.DownloadOrder(fileName, encryptedFilePath, true);
 
             return new FileInfo(encryptedFilePath);
+        }
+
+        public bool UploadCostcoConfirm(string fileName, IAppSettingsService appSettings)
+        {
+            string encryptedFilePath = Path.Combine(appSettings.Costco.Dir.Encrypt.Confirms.Path, fileName);
+
+            CostcoCHFtp costcoFtp = new CostcoCHFtp();
+            return costcoFtp.UploadConfirm(encryptedFilePath);
         }
     }
 }
