@@ -25,6 +25,8 @@ namespace ComHub
         string FtpPass { get; } 
         string GnupgDir { get; }
         string Passphrase { get; }
+
+        string FileSpec(string fileName);
     }
     
     public class AppSettingsService : IAppSettingsService
@@ -150,6 +152,14 @@ namespace ComHub
 
                 return System.IO.Path.Combine(paths.ToArray());
             }
+        }
+
+        public string FileSpec(string fileName)
+        {
+                var paths = (from k in keys
+                            select keyValue(k)).ToList();
+                paths.Add(fileName);
+                return System.IO.Path.Combine(paths.ToArray());
         }
 
         public string PartnerID { get {return merchKeyValue(partnerID);}}

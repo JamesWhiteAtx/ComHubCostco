@@ -20,39 +20,9 @@ namespace ComHubCostco
     {
         public static void Main(string[] args)
         {
-            DirectoryInfo dir = new DirectoryInfo(@"C:\CommerceHub\XML\Orders");
-            FileInfo[] decryptInfos = dir.GetFiles("*.xml");
-            
-            dir = new DirectoryInfo(@"C:\CommerceHub\Encrypted\Orders");
-            FileInfo[] encryptInfos = dir.GetFiles("*.gpg");
-
-            
-
-            var leftOuterJoin = from d in decryptInfos
-                                join e in encryptInfos
-                                on Path.GetFileNameWithoutExtension(d.Name) equals Path.GetFileNameWithoutExtension(e.Name)
-                                into temp
-                                from t in temp.DefaultIfEmpty()
-                                select new
-                                {
-                                    ID = Path.GetFileNameWithoutExtension(d.Name),
-                                    a = d,
-                                    b = t
-                                };
-
-            var rightOuterJoin = from e in encryptInfos
-                                 join d in decryptInfos
-                                 on Path.GetFileNameWithoutExtension(e.Name) equals Path.GetFileNameWithoutExtension(d.Name)
-                                 into temp
-                                 from t in temp.DefaultIfEmpty()
-                                 select new
-                                 {
-                                     ID = Path.GetFileNameWithoutExtension(e.Name),
-                                     a = t,
-                                     b = e
-                                 };
-
-            var fullOuterJoin = leftOuterJoin.Union(rightOuterJoin).OrderBy(x => x.ID).ToList();
+            AppSettingsService app = new AppSettingsService();
+            Console.WriteLine(app.Costco.Dir.Encrypt.Orders.FileSpec("file.ext"));
+            Console.ReadKey();
         }
 
         //
