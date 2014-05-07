@@ -17,6 +17,8 @@ namespace ComHub
         FileInfo CostcoEncryptFileOrder(string fileName, IAppSettingsService appSettings);
         FileInfo CostcoDecryptFileConfirm(string fileName, IAppSettingsService appSettings);
 
+        FileInfo SaveCostcoConfirm(ConfirmMessageBatch confirmBatch, IAppSettingsService appSettings);
+
         OrderMessageBatch CostcoMessageBatchOrder(string fileName, IAppSettingsService appSettings);
         ConfirmMessageBatch CostcoMessageBatchConfirm(string fileName, IAppSettingsService appSettings);
     }
@@ -82,6 +84,15 @@ namespace ComHub
         {
             string filePath = Path.Combine(appSettings.Costco.Dir.Decrypt.Confirms.Path, fileName);
             return ConfirmMessageBatch.Deserialize(filePath);
+        }
+
+        public FileInfo SaveCostcoConfirm(ConfirmMessageBatch confirmBatch, IAppSettingsService appSettings)
+        {
+            string saveFilePath = Path.Combine(appSettings.Costco.Dir.Decrypt.Confirms.Path, confirmBatch.FileName);
+            confirmBatch.ValidateXml();
+            confirmBatch.SaveFile(saveFilePath);
+
+            return new FileInfo(saveFilePath);
         }
     }
 

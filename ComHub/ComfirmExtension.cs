@@ -17,6 +17,9 @@ namespace ComHub
         public participatingPartyName EnumPartyName { get; set; }
 
         [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public string FileName { get; set; }
+
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
         public string Merchant { get; set; }
 
         [System.Xml.Serialization.XmlIgnoreAttribute()]
@@ -92,7 +95,7 @@ namespace ComHub
 
     public partial class hubConfirm
     {
-        private string packageDetailsPrfx = "P_";
+        //private string packageDetailsPrfx = "P_";
         protected ConfirmMessageBatch confirmMessageBatch;
         private List<packageDetail> packageDetailList;
         private List<hubAction> hubActionList;
