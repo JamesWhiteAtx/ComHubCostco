@@ -9,17 +9,17 @@ namespace ComHub
 {
     public interface ICHFtpService
     {
-        List<FTPfileInfo> GetCostcoOrders();
+        List<IFTPfileInfo> GetCostcoOrders();
         FileInfo DownloadCostoOrder(string fileName, IAppSettingsService appSettings);
         bool UploadCostcoConfirm(string fileName, IAppSettingsService appSettings);
     }
 
     public class CHFtpService : ICHFtpService
     {
-        public List<FTPfileInfo> GetCostcoOrders()
+        public List<IFTPfileInfo> GetCostcoOrders()
         {
             CostcoCHFtp costcoFtp = new CostcoCHFtp();
-            List<FTPfileInfo> orders = costcoFtp.GetFtpOrders();
+            List<IFTPfileInfo> orders = costcoFtp.GetFtpOrders();
             return orders;
         }
 

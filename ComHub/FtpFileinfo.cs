@@ -12,7 +12,22 @@ namespace FTP
 {
 
 	#region "FTP file info class"
-	/// <summary>
+
+    public interface IFTPfileInfo
+    {
+        string Extension { get; }
+        DateTime FileDateTime { get; }
+        string Filename { get; }
+        FTP.FTPfileInfo.DirectoryEntryTypes FileType { get; }
+        string FullName { get; }
+        string NameOnly { get; }
+        string Path { get; }
+        string Permission { get; }
+        long Size { get; }
+    }
+
+
+    /// <summary>
 	/// Represents a file or directory entry from an FTP listing
 	/// </summary>
 	/// <remarks>
@@ -21,7 +36,7 @@ namespace FTP
 	/// 
 	/// v1.1 fixed bug in Fullname/path
 	/// </remarks>
-	public class FTPfileInfo
+    public class FTPfileInfo : IFTPfileInfo
 	{
 		
 		//Stores extended info about FTP file

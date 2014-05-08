@@ -16,7 +16,7 @@ namespace FTP
 	/// Stores a list of files and directories from an FTP result
 	/// </summary>
 	/// <remarks></remarks>
-	public class FTPdirectory : List<FTPfileInfo>
+	public class FTPdirectory : List<IFTPfileInfo>
 	{
 		
 		
