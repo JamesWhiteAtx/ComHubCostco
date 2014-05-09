@@ -10,9 +10,15 @@ namespace ComHub
     {
         FileInfo[] CostcoDecryptFilesOrder(IAppSettingsService appSettings);
         FileInfo[] CostcoDecryptFilesConfirm(IAppSettingsService appSettings);
+        FileInfo[] CostcoDecryptFilesFA(IAppSettingsService appSettings);
 
         FileInfo[] CostcoEncryptFilesOrder(IAppSettingsService appSettings);
         FileInfo[] CostcoEncryptFilesConfirm(IAppSettingsService appSettings);
+        FileInfo[] CostcoEncryptFilesFA(IAppSettingsService appSettings);
+
+        IEnumerable<IDecryptFile> CostcoReadFilesOrder(IAppSettingsService appSettings);
+        IEnumerable<IDecryptFile> CostcoReadFilesConfirm(IAppSettingsService appSettings);
+        IEnumerable<IDecryptFile> CostcoReadFilesFA(IAppSettingsService appSettings);
 
         FileInfo CostcoEncryptFileOrder(string fileName, IAppSettingsService appSettings);
         FileInfo CostcoDecryptFileConfirm(string fileName, IAppSettingsService appSettings);
@@ -21,6 +27,9 @@ namespace ComHub
 
         OrderMessageBatch CostcoMessageBatchOrder(string fileName, IAppSettingsService appSettings);
         ConfirmMessageBatch CostcoMessageBatchConfirm(string fileName, IAppSettingsService appSettings);
+        FAMessageBatch CostcoMessageBatchFA(string fileName, IAppSettingsService appSettings);
+
+        
     }
 
     public class FileService : IFileService
@@ -46,6 +55,11 @@ namespace ComHub
             return CostcoDecryptFiles(appSettings.Costco.Dir.Decrypt.Confirms.Path);
         }
 
+        public FileInfo[] CostcoDecryptFilesFA(IAppSettingsService appSettings)
+        {
+            return CostcoDecryptFiles(appSettings.Costco.Dir.Decrypt.FAs.Path);
+        }
+
         private FileInfo[] CostcoEncryptFiles(string dirFiles)
         {
             DirectoryInfo d = new DirectoryInfo(dirFiles);
@@ -60,6 +74,38 @@ namespace ComHub
         public FileInfo[] CostcoEncryptFilesConfirm(IAppSettingsService appSettings)
         {
             return CostcoEncryptFiles(appSettings.Costco.Dir.Encrypt.Confirms.Path);
+        }
+
+        public FileInfo[] CostcoEncryptFilesFA(IAppSettingsService appSettings)
+        {
+            return CostcoEncryptFiles(appSettings.Costco.Dir.Encrypt.FAs.Path);
+        }
+
+        public IEnumerable<IDecryptFile> CostcoReadFilesOrder(IAppSettingsService appSettings)
+        {
+            FileInfo[] decryptedFiles = this.CostcoDecryptFilesOrder(appSettings);
+            FileInfo[] encryptedFiles = this.CostcoEncryptFilesOrder(appSettings);
+
+            IEnumerable<IDecryptFile> files = DecryptFile.FilesFromFileInfos(decryptedFiles, encryptedFiles);
+            return files;
+        }
+
+        public IEnumerable<IDecryptFile> CostcoReadFilesConfirm(IAppSettingsService appSettings)
+        {
+            FileInfo[] decryptedFiles = this.CostcoDecryptFilesConfirm(appSettings);
+            FileInfo[] encryptedFiles = this.CostcoEncryptFilesConfirm(appSettings);
+
+            IEnumerable<IDecryptFile> files = DecryptFile.FilesFromFileInfos(decryptedFiles, encryptedFiles);
+            return files;
+        }
+
+        public IEnumerable<IDecryptFile> CostcoReadFilesFA(IAppSettingsService appSettings)
+        {
+            FileInfo[] decryptedFiles = this.CostcoDecryptFilesFA(appSettings);
+            FileInfo[] encryptedFiles = this.CostcoEncryptFilesFA(appSettings);
+
+            IEnumerable<IDecryptFile> files = DecryptFile.FilesFromFileInfos(decryptedFiles, encryptedFiles);
+            return files;
         }
 
         public FileInfo CostcoEncryptFileOrder(string fileName, IAppSettingsService appSettings)
@@ -84,6 +130,12 @@ namespace ComHub
         {
             string filePath = Path.Combine(appSettings.Costco.Dir.Decrypt.Confirms.Path, fileName);
             return ConfirmMessageBatch.Deserialize(filePath);
+        }
+
+        public FAMessageBatch CostcoMessageBatchFA(string fileName, IAppSettingsService appSettings)
+        {
+            string filePath = Path.Combine(appSettings.Costco.Dir.Decrypt.FAs.Path, fileName);
+            return FAMessageBatch.Deserialize(filePath);
         }
 
         public FileInfo SaveCostcoConfirm(ConfirmMessageBatch confirmBatch, IAppSettingsService appSettings)

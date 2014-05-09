@@ -45,9 +45,11 @@
     <Compile Include="ComfirmExtension.cs" />
     <Compile Include="ComHubExtensions.cs" />
     <Compile Include="Confirmation_Order.cs" />
+    <Compile Include="DecryptFile.cs" />
     <Compile Include="FA.cs">
       <DependentUpon>FA.xsd</DependentUpon>
     </Compile>
+    <Compile Include="FAExtension.cs" />
     <Compile Include="FtpClient.cs" />
     <Compile Include="FtpDirectory.cs" />
     <Compile Include="FtpFileinfo.cs" />
