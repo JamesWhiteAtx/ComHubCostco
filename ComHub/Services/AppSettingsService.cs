@@ -15,6 +15,7 @@ namespace ComHub
         IAppSettingsService Orders { get; }
         IAppSettingsService Payments { get; }
         IAppSettingsService Confirms { get; }
+        IAppSettingsService FAs { get; }
         string Path { get; }
         string PartnerID { get; } 
         string PartyName { get; } 
@@ -43,6 +44,7 @@ namespace ComHub
         const string dirOrders = dirPrfx + "Orders";
         const string dirPayments = dirPrfx + "Payments";
         const string dirConfirms = dirPrfx + "Confirms";
+        const string dirFAs = dirPrfx + "FA";
 
         const string partnerID = "partnerID";
         const string partyName  ="partyName";
@@ -139,6 +141,15 @@ namespace ComHub
             get
             {
                 addKey(dirConfirms);
+                return this;
+            }
+        }
+
+        public IAppSettingsService FAs
+        {
+            get
+            {
+                addKey(dirFAs);
                 return this;
             }
         }
