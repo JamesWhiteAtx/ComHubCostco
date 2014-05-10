@@ -33,7 +33,7 @@ namespace ComHub
 
         public void CostcoSetup()
         {
-            Merchant = "Costco";
+            Merchant = MessageBatch.Costco;
             EnumPartyName = participatingPartyName.Costco;
 
             OurPartnerId = System.Configuration.ConfigurationManager.AppSettings["partnerID" + Merchant];

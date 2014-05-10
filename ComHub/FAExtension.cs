@@ -20,7 +20,7 @@ namespace ComHub
 
         public void CostcoSetup()
         {
-            Merchant = "Costco";
+            Merchant = MessageBatch.Costco;
             partnerID = System.Configuration.ConfigurationManager.AppSettings["partnerID" + Merchant];
         }
 
@@ -55,9 +55,15 @@ namespace ComHub
     public partial class FAMessageBatchHubFA
     {
         protected FAMessageBatch faMessageBatch;
+        protected List<FAMessageBatchHubFAMessageAck> messageAckList;
 
         public FAMessageBatchHubFA()
         {
+            messageBatchLink = new FAMessageBatchHubFAMessageBatchLink();
+            messageBatchDisposition = new FAMessageBatchHubFAMessageBatchDisposition();
+            
+            messageAckList = new List<FAMessageBatchHubFAMessageAck>();
+            AssignMessageAcks();
         }
 
         public FAMessageBatchHubFA(FAMessageBatch faMsgBatch)
@@ -66,5 +72,38 @@ namespace ComHub
             faMessageBatch = faMsgBatch;
         }
 
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public List<FAMessageBatchHubFAMessageAck> MessageAckList { get { return messageAckList; } }        
+
+        public void AssignMessageAcks()
+        {
+            messageAckField = messageAckList.ToArray();
+            int acks = messageAckField.Length;
+            int acpts = messageAckField.Count(ack => ack.messageDisposition.status == FAMessageBatchHubFAMessageAckMessageDispositionStatus.A);
+
+            messageBatchDisposition.trxReceivedCount = acks.ToString();
+            messageBatchDisposition.trxAcceptedCount = acpts.ToString();
+        }
+
+        public FAMessageBatchHubFAMessageAck AddMessageAck()
+        {
+            FAMessageBatchHubFAMessageAck newAck = new FAMessageBatchHubFAMessageAck();
+            return AddMessageAck(newAck);
+        }
+
+        public FAMessageBatchHubFAMessageAck AddMessageAck(FAMessageBatchHubFAMessageAck newAck)
+        {
+            messageAckList.Add(newAck);
+            AssignMessageAcks();
+            return newAck;
+        }
+    }
+
+    public partial class FAMessageBatchHubFAMessageBatchDisposition
+    {
+        public FAMessageBatchHubFAMessageBatchDisposition()
+        {
+
+        }
     }
 }

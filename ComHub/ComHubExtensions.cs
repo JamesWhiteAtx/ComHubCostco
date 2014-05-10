@@ -14,6 +14,10 @@ namespace ComHub
     public class MessageBatch
     {
         protected string xsdFile;
+        public const string Costco = "Costco";
+
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public string XsdFile { get { return xsdFile; } }
 
         public static T Deserialize<T>(string path)
         {
